@@ -59,6 +59,12 @@ export interface HeaderProps {
    */
   TitleActionComponent?: ReactElement
   /**
+   * Let `TitleActionComponent` receive touches. Off by default: the title sits in a
+   * full-width overlay above the action components, so it ignores touches unless the
+   * title itself is meant to be pressed.
+   */
+  isTitleInteractive?: boolean
+  /**
    * Title text to display if not using `tx` or nested components.
    */
   title?: TextProps["text"]
@@ -200,6 +206,7 @@ export function Header(props: HeaderProps) {
     rightTxOptions,
     safeAreaEdges = ["top"],
     TitleActionComponent,
+    isTitleInteractive = false,
     // title = appName,
     title,
     titleMode = "center",
@@ -251,8 +258,10 @@ export function Header(props: HeaderProps) {
                     titleMode === "flex" && $titleWrapperFlex,
                     $titleContainerStyleOverride,
                 ]}
-                pointerEvents="none"
-            >           
+                // box-none: only the title's own pressables take touches, the
+                // overlay around them still passes taps through to the actions
+                pointerEvents={isTitleInteractive ? "box-none" : "none"}
+            >
             {TitleActionComponent}
             </View>       
         )}

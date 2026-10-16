@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {ReactNode, useState} from 'react'
 import {observer} from 'mobx-react-lite'
 import {ColorValue, Keyboard, Pressable, TextStyle, View, ViewStyle} from 'react-native'
 import FastImage from 'react-native-fast-image'
@@ -49,33 +49,42 @@ const WalletAvatar = observer(function (props: {wallet: WalletEntry; size: numbe
 })
 
 /**
- * Wallet screen header button that opens the switcher. Shows the active
- * wallet's name once there is more than one wallet to tell apart.
+ * Wallet screen header title: the active wallet's name with a chevron, opening the
+ * switcher. Shown even with one wallet so the switcher can be found. `status`
+ * renders under the name (the screen's offline and sync messages).
  */
-export const WalletSwitcherButton = observer(function (props: {
+export const WalletSwitcherTitle = observer(function (props: {
     onPress: () => void
     color: ColorValue
+    status?: ReactNode
 }) {
-    const {onPress, color} = props
+    const {onPress, color, status} = props
     const name = walletDisplayName(walletsStore.active)
 
     return (
         <Pressable
-            style={$switcherButton}
+            style={$titleButton}
             onPress={onPress}
             hitSlop={spacing.small}
             accessibilityRole='button'
             accessibilityLabel={`${translate('walletSwitcher_title')}: ${name}`}
         >
-            <Icon icon='faWallet' color={color} />
-            {walletsStore.wallets.length > 1 && (
+            <View style={$titleRow}>
                 <Text
                     text={name}
-                    size='xs'
+                    weight='medium'
+                    size='md'
                     numberOfLines={1}
-                    style={[$switcherLabel, {color}]}
+                    style={[$titleText, {color}]}
                 />
-            )}
+                <Icon
+                    icon='faChevronDown'
+                    size={spacing.small}
+                    color={color}
+                    containerStyle={$titleChevron}
+                />
+            </View>
+            {status}
         </Pressable>
     )
 })
@@ -224,15 +233,21 @@ const $initialCircle: ViewStyle = {
     justifyContent: 'center',
 }
 
-const $switcherButton: ViewStyle = {
-    flexDirection: 'row',
+const $titleButton: ViewStyle = {
     alignItems: 'center',
-    paddingHorizontal: spacing.tiny,
 }
 
-const $switcherLabel: TextStyle = {
+const $titleRow: ViewStyle = {
+    flexDirection: 'row',
+    alignItems: 'center',
+}
+
+const $titleText: TextStyle = {
+    flexShrink: 1,
+}
+
+const $titleChevron: ViewStyle = {
     marginLeft: spacing.tiny,
-    maxWidth: spacing.screenWidth * 0.25,
 }
 
 const $heading: TextStyle = {

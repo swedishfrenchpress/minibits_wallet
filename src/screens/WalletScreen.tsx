@@ -51,7 +51,7 @@ import { CurrencySign } from './Wallet/CurrencySign'
 import { CurrencyCode, MintUnit, MintUnitCurrencyPairs, convertToFromSats, getCurrency } from "../services/wallet/currency"
 import { CurrencyAmount } from './Wallet/CurrencyAmount'
 import { LeftProfileHeader } from './ContactsScreen'
-import { WalletSwitcherButton, WalletSwitcherSheet } from './Wallet/WalletSwitcher'
+import { WalletSwitcherTitle, WalletSwitcherSheet } from './Wallet/WalletSwitcher'
 import { getUnixTime } from 'date-fns/getUnixTime'
 import FastImage from 'react-native-fast-image'
 import { HotUpdater } from '@hot-updater/react-native'
@@ -790,19 +790,18 @@ export const WalletScreen = observer(function WalletScreen({ route }: Props) {
       <Screen contentContainerStyle={$screen} preset='fixed'>
             <Header
                 //style={{borderBottomWidth: 2, borderBottomColor: 'white'}}
-                LeftActionComponent={
-                    <View style={$headerLeftActions}>
-                        <LeftProfileHeader
-                            gotoProfile={gotoProfile}
-                            isAvatarVisible={false}
-                        />
-                        <WalletSwitcherButton
-                            onPress={toggleWalletsModal}
-                            color={headerTitleColor}
-                        />
-                    </View>
+                LeftActionComponent={<LeftProfileHeader
+                    gotoProfile={gotoProfile}
+                    isAvatarVisible={false}
+                />}
+                TitleActionComponent={
+                    <WalletSwitcherTitle
+                        onPress={toggleWalletsModal}
+                        color={headerTitleColor}
+                        status={<HeaderTitle />}
+                    />
                 }
-                TitleActionComponent={<HeaderTitle />}               
+                isTitleInteractive={true}
                 RightActionComponent={
                 <View style={{justifyContent: 'flex-end', flexDirection: 'row', alignItems: 'center'}}>
                     {pendingCount > 0 && (
@@ -1280,11 +1279,6 @@ const $screen: ViewStyle = {
 
 }
 
-const $headerLeftActions: ViewStyle = {
-    flexDirection: 'row',
-    alignItems: 'center',
-}
-
 // The transactions card is pulled up over the header container: $tabContainer
 // shifts up by CARD_PULL_UP and pads the card back down by spacing.small, so the
 // card's top edge ends up HEADER_CARD_OVERLAP above the header's bottom edge.
@@ -1444,7 +1438,8 @@ const $headerTitle: TextStyle = {
     paddingHorizontal: spacing.small,
     borderRadius: spacing.tiny,
     alignSelf: 'center',
-    marginVertical: spacing.small,
+    // Sits under the wallet name in the header now, so only a small gap above
+    marginTop: spacing.micro,
     lineHeight: spacing.medium,
     color: 'white'
 }
