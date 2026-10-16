@@ -51,6 +51,7 @@ import { CurrencySign } from './Wallet/CurrencySign'
 import { CurrencyCode, MintUnit, MintUnitCurrencyPairs, convertToFromSats, getCurrency } from "../services/wallet/currency"
 import { CurrencyAmount } from './Wallet/CurrencyAmount'
 import { LeftProfileHeader } from './ContactsScreen'
+import { WalletSwitcherButton, WalletSwitcherSheet } from './Wallet/WalletSwitcher'
 import { getUnixTime } from 'date-fns/getUnixTime'
 import FastImage from 'react-native-fast-image'
 import { HotUpdater } from '@hot-updater/react-native'
@@ -101,6 +102,7 @@ export const WalletScreen = observer(function WalletScreen({ route }: Props) {
     const [isUpdateModalVisible, setIsUpdateModalVisible] = useState<boolean>(false)
     const [isSendModalVisible, setIsSendModalVisible] = useState<boolean>(false)
     const [isReceiveModalVisible, setIsReceiveModalVisible] = useState<boolean>(false)
+    const [isWalletsModalVisible, setIsWalletsModalVisible] = useState<boolean>(false)
     const [headerTitle, setHeaderTitle] = useState<string>('')
     const [headerStyle, setHeaderStyle] = useState<'success' | 'warning' | 'error'>('success')
     const [updateDescription, setUpdateDescription] = useState<string>('')
@@ -455,6 +457,20 @@ export const WalletScreen = observer(function WalletScreen({ route }: Props) {
         setIsReceiveModalVisible(previousState => !previousState)
     }
 
+    const toggleWalletsModal = () => {
+        setIsWalletsModalVisible(previousState => !previousState)
+    }
+
+    const gotoProfile = function () {
+        // @ts-ignore
+        navigation.navigate('ContactsNavigator', {
+            screen: 'Profile',
+            params: {
+                prevScreen: 'Wallet'
+            }
+        })
+    }
+
     const addMint = async function ({scannedMintUrl = ''} = {}) {
         // necessary
         // @ts-ignore
@@ -495,16 +511,6 @@ export const WalletScreen = observer(function WalletScreen({ route }: Props) {
                 showPending: true
             }
         }) 
-    }
-
-    const gotoProfile = function () {
-        // @ts-ignore
-        navigation.navigate('ContactsNavigator', {
-            screen: 'Profile',
-            params: {
-                prevScreen: 'Wallet'
-            }
-        })        
     }
 
     const gotoMintInfo = function (mintUrl: string) {
@@ -784,10 +790,18 @@ export const WalletScreen = observer(function WalletScreen({ route }: Props) {
       <Screen contentContainerStyle={$screen} preset='fixed'>
             <Header
                 //style={{borderBottomWidth: 2, borderBottomColor: 'white'}}
-                LeftActionComponent={<LeftProfileHeader 
-                    gotoProfile={gotoProfile}
-                    isAvatarVisible={false}
-                />}                
+                LeftActionComponent={
+                    <View style={$headerLeftActions}>
+                        <LeftProfileHeader
+                            gotoProfile={gotoProfile}
+                            isAvatarVisible={false}
+                        />
+                        <WalletSwitcherButton
+                            onPress={toggleWalletsModal}
+                            color={headerTitleColor}
+                        />
+                    </View>
+                }
                 TitleActionComponent={<HeaderTitle />}               
                 RightActionComponent={
                 <View style={{justifyContent: 'flex-end', flexDirection: 'row', alignItems: 'center'}}>
@@ -897,6 +911,11 @@ export const WalletScreen = observer(function WalletScreen({ route }: Props) {
             {info && <InfoModal message={info} />}
             {error && <ErrorModal error={error} />}
             {isLoading && <Loading />}
+
+            <WalletSwitcherSheet
+                isVisible={isWalletsModalVisible}
+                onClose={toggleWalletsModal}
+            />
 
         <BottomModal
             isVisible={isUpdateModalVisible ? true : false}
@@ -1258,7 +1277,12 @@ export const getMintColor = function (unit: MintUnit) {
 
 
 const $screen: ViewStyle = {
-   
+
+}
+
+const $headerLeftActions: ViewStyle = {
+    flexDirection: 'row',
+    alignItems: 'center',
 }
 
 // The transactions card is pulled up over the header container: $tabContainer
